@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - path_provider (0.0.1):
+    - Flutter
+  - save_in_gallery (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - save_in_gallery (from `.symlinks/plugins/save_in_gallery/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+  save_in_gallery:
+    :path: ".symlinks/plugins/save_in_gallery/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  save_in_gallery: 75c1d76566ed1af3a266f25b38c6c19a1d019a66
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.9.3
