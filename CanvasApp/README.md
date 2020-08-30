@@ -1,6 +1,6 @@
 # CanvasApp
 
-A new Flutter project.
+Drawing Application. Enjoy filing colors in paintings!!
 
 ## Getting Started
 
