@@ -42,17 +42,17 @@ class _CanvasPaintingState extends State<CanvasPainting> {
   void initState() {
     super.initState();
     getImageData().then((value) => stoploading());
+    _loadImage();
   }
 
   _loadImage() async {
-    ByteData bd = await rootBundle.load("assets/images/image01.jpg");
+    ByteData bd = await rootBundle.load("images/image01.jpg");
 
     final Uint8List bytes = Uint8List.view(bd.buffer);
 
     final ui.Codec codec = await ui.instantiateImageCodec(bytes);
 
     final ui.Image image = (await codec.getNextFrame()).image;
-
     print(image);
 
     setState(() => _image = image);
@@ -399,6 +399,7 @@ class _CanvasPaintingState extends State<CanvasPainting> {
                   size: Size.infinite,
                   painter: MyPainter(
                     pointsList: points,
+                    image: _image,
                   ),
                 ),
               ],
@@ -417,16 +418,24 @@ class _CanvasPaintingState extends State<CanvasPainting> {
 }
 
 class MyPainter extends CustomPainter {
-  MyPainter({this.pointsList});
+  MyPainter({this.pointsList, this.image});
 
   //Keep track of the points tapped on the screen
   List<TouchPoints> pointsList;
   List<Offset> offsetPoints = List();
 
+  ui.Image image;
+
   //This is where we can draw on canvas.
   @override
   void paint(Canvas canvas, Size size) {
+    var imagePaint = new Paint();
+    imagePaint.color = Colors.black;
+    imagePaint.style = PaintingStyle.stroke;
+    imagePaint.strokeWidth = 10;
+
     canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
+    canvas.drawImage(image, Offset.zero, imagePaint);
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
         //Drawing line when two consecutive points are available
