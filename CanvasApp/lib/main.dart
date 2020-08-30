@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:image/image.dart' as IMG;
 
 import 'package:CanvasApp/ColorPickerDialog.dart';
 import 'package:CanvasApp/Pick_ImagetoDrawDialog.dart';
@@ -34,6 +35,7 @@ class _CanvasPaintingState extends State<CanvasPainting> {
   Color selectedColor = Colors.black;
   bool eraser = false;
   List<String> imageData;
+  List<ui.Image> _imageData;
   int selectedImageIndex = 0;
   bool isloading = true;
   ui.Image _image;
@@ -42,20 +44,21 @@ class _CanvasPaintingState extends State<CanvasPainting> {
   void initState() {
     super.initState();
     getImageData().then((value) => stoploading());
-    _loadImage();
   }
 
   _loadImage() async {
-    ByteData bd = await rootBundle.load("images/image01.jpg");
-
-    final Uint8List bytes = Uint8List.view(bd.buffer);
-
-    final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+    final ByteData bd = await rootBundle.load(imageData[selectedImageIndex]);
+    final IMG.Image baseSizeImage = IMG.decodeImage(bd.buffer.asUint8List());
+    print('#########${baseSizeImage.height}X${baseSizeImage.width}');
+    final IMG.Image resizeImage =
+        IMG.copyResize(baseSizeImage, height: 667 , width: 375);
+    final ui.Codec codec =
+        await ui.instantiateImageCodec(IMG.encodePng(resizeImage));
 
     final ui.Image image = (await codec.getNextFrame()).image;
-    print(image);
-
-    setState(() => _image = image);
+    setState(() {
+      _image = image;
+    });
   }
 
   Future<void> getImageData() async {
@@ -69,6 +72,7 @@ class _CanvasPaintingState extends State<CanvasPainting> {
   }
 
   void stoploading() {
+    _loadImage();
     setState(() {
       isloading = false;
     });
@@ -167,6 +171,7 @@ class _CanvasPaintingState extends State<CanvasPainting> {
     if (selectedIndex != null) {
       setState(() {
         selectedImageIndex = selectedIndex;
+        _loadImage();
         print('selectedImageIndex $selectedImageIndex');
       });
     }
@@ -390,11 +395,6 @@ class _CanvasPaintingState extends State<CanvasPainting> {
             key: globalKey,
             child: Stack(
               children: <Widget>[
-                Center(
-                  child: isloading
-                      ? CircularProgressIndicator()
-                      : Image.asset(imageData[selectedImageIndex]),
-                ),
                 CustomPaint(
                   size: Size.infinite,
                   painter: MyPainter(
@@ -435,7 +435,6 @@ class MyPainter extends CustomPainter {
     imagePaint.strokeWidth = 10;
 
     canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
-    canvas.drawImage(image, Offset.zero, imagePaint);
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
         //Drawing line when two consecutive points are available
@@ -452,6 +451,9 @@ class MyPainter extends CustomPainter {
             ui.PointMode.points, offsetPoints, pointsList[i].paint);
       }
     }
+    canvas.restore();
+    canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
+    canvas.drawImage(image, Offset.zero, imagePaint);
     canvas.restore();
   }
 
